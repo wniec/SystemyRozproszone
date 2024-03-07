@@ -1,18 +1,20 @@
-object Main {
-  @main
-  def main(): Unit ={
-    val T1: Thread = new Thread(){
-      override def run(): Unit ={
-        (new TCPServer).main()
-      }
+private object Main {
+  def main(args: Array[String]): Unit ={
+    if(args.length==0){
+      new Thread() {
+        override def run(): Unit = {
+          Server.main()
+        }
+      }.start()
     }
-    val T2: Thread = new Thread() {
-      override def run(): Unit = {
-        TCPClient.main()
-      }
+    else{
+      val address = args(0)
+      new Thread() {
+        override def run(): Unit = {
+          Client(address).main()
+        }
+      }.start()
     }
-    T1.start()
-    T2.start()
   }
 
 }
