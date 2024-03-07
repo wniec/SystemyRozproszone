@@ -2,12 +2,15 @@ import java.io.{BufferedReader, IOException, InputStreamReader, PrintWriter}
 import java.lang.Runnable
 import java.lang.Thread.sleep
 import java.net.{DatagramPacket, DatagramSocket, InetAddress, MulticastSocket, Socket, SocketException}
+import java.util.Scanner
+import scala.collection.immutable.Stream.Empty.++
 import scala.util.Random
 private class Client(val socket: Socket, val ID : Int, in: BufferedReader, out: PrintWriter) {
   var UDPSocket = new DatagramSocket(socket.getLocalPort)
-  var multicastSocket: Option[DatagramSocket] = None
-  val group: InetAddress = InetAddress.getByName("230.0.0.0")
-  val art: String =
+  private var isTyping: Boolean = false
+  private var multicastSocket: Option[DatagramSocket] = None
+  private val group: InetAddress = InetAddress.getByName("230.0.0.0")
+  private val art: String =
     s"""
        |_____w
        |                   .d88888888bo.
@@ -76,25 +79,44 @@ private class Client(val socket: Socket, val ID : Int, in: BufferedReader, out: 
     }.start()
   }
 
-  def UDPConnection(): Unit = {
-    sleep(200)
-    val sign: Int = System.in.read()
-    if sign == 107 then{
-      val address: InetAddress = InetAddress.getByName("localhost")
-      val sendBuffer: Array[Byte] = (String.valueOf(ID) + art).getBytes()
-      val sendPacket: DatagramPacket = new DatagramPacket(sendBuffer, sendBuffer.length, address, 12345)
-      UDPSocket.send(sendPacket)
-    }
-    else if sign == 108 then {
-      multicastSocket = Some(new DatagramSocket())
-      val address: InetAddress = InetAddress.getByName("230.0.0.0")
-      val sendBuffer: Array[Byte] = (String.valueOf(ID) + art1).getBytes()
-      val sendPacket: DatagramPacket = new DatagramPacket(sendBuffer, sendBuffer.length, address, 22223)
-      multicastSocket.get.send(sendPacket)
+  private def UDPConnection(): Unit = {
+    sleep(400)
+    if(!isTyping){
+      val sign: Int = System.in.read()
+      if sign == 117 then {
+        val address: InetAddress = InetAddress.getByName("localhost")
+        isTyping = true
+        sendMessage(UDPSocket,address,12345)
+      }
+      else if sign == 109 then {
+        multicastSocket = Some(new DatagramSocket())
+        val address: InetAddress = InetAddress.getByName("230.0.0.0")
+        isTyping = true
+        sendMessage(multicastSocket.get,address,22223)
+      }
     }
   }
-
-  def multicastListen(): Unit = this.synchronized{
+  private def getInputLines: String ={
+    val userInput: Scanner = new Scanner(System.in)
+    var input = userInput.nextLine
+    while (input.isEmpty) {
+      input = userInput.nextLine()
+    }
+    var text = input
+    while (input.nonEmpty) {
+      input = userInput.nextLine()
+      text = text + "\n" + input
+    }
+    text
+  }
+  private def sendMessage(sck: DatagramSocket, addr: InetAddress, portNumber: Int): Unit ={
+    val lines = getInputLines
+    val sendBuffer: Array[Byte] = lines.getBytes()
+    val sendPacket: DatagramPacket = new DatagramPacket(sendBuffer, sendBuffer.length, addr, portNumber)
+    sck.send(sendPacket)
+    isTyping = false
+  }
+  private def multicastListen(): Unit = this.synchronized{
     val receiveBuffer: Array[Byte] = Array.fill[Byte](2000)(0)
     val receivePacket: DatagramPacket = new DatagramPacket(receiveBuffer, 2000)
     val multicastReceiveSocket = new MulticastSocket(22223)
@@ -110,17 +132,20 @@ private class Client(val socket: Socket, val ID : Int, in: BufferedReader, out: 
     multicastReceiveSocket.disconnect()
     multicastReceiveSocket
   }
-  def TCPConnection(): Unit ={
+  private def TCPConnection(): Unit ={
     println("SCALA TCP CLIENT")
     while (true) {
-      out.println("Ping Scala TCP")
-      sleep(400)
-      var response: String = in.readLine()
-      if response.nonEmpty then{
-        System.out.println("[" + ID.toString + "]: received response: " + response.trim)
-        while(response != null && response.nonEmpty&& in.ready()){
-          response = in.readLine()
-          System.out.println(response.trim())
+      sleep(600)
+      if(!isTyping){
+        out.println("Ping Scala TCP")
+        var response: String = in.readLine()
+        if response.nonEmpty then {
+          sleep(200)
+          System.out.println("[" + ID.toString + "]: received response: " + response.trim)
+          while (response != null && response.nonEmpty && in.ready()) {
+            response = in.readLine()
+            System.out.println(response.trim())
+          }
         }
       }
     }

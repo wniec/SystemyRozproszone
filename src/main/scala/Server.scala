@@ -9,10 +9,10 @@ import scala.collection.mutable.ArrayBuffer
 import scala.runtime.Arrays
 import scala.util.Random
 object Server {
-  val IDs = new mutable.LinkedHashMap[Int, Int]
-  val sockets = new mutable.LinkedHashMap[Int, (Socket, PrintWriter, BufferedReader)]
+  private val IDs = new mutable.LinkedHashMap[Int, Int]
+  private val sockets = new mutable.LinkedHashMap[Int, (Socket, PrintWriter, BufferedReader)]
   val portNumber: Int = 12345
-  val TCPSocket = new ServerSocket(portNumber)
+  private val TCPSocket = new ServerSocket(portNumber)
 
   def main(): Unit = {
     println("SCALA UDP SERVER")
@@ -35,13 +35,13 @@ object Server {
       }
   }
 
-  def addClient(clientSocket: Socket, out: PrintWriter, in: BufferedReader): Unit = this.synchronized {
+  private def addClient(clientSocket: Socket, out: PrintWriter, in: BufferedReader): Unit = this.synchronized {
     val ID = 1000 + IDs.size
     IDs(clientSocket.getPort) = ID
     sockets(ID) = (clientSocket, out, in)
     out.println(ID.toString)
   }
-  def UDPClientService(): Unit ={
+  private def UDPClientService(): Unit ={
     var receiveBuffer: Array[Byte] = Array.fill[Byte](20)(0)
     var UDPSocket = new DatagramSocket(portNumber)
     while (true){
@@ -57,7 +57,7 @@ object Server {
     }
   }
 
-  def clientService(clientSocket: Socket): Unit = {
+  private def clientService(clientSocket: Socket): Unit = {
     val out: PrintWriter = new PrintWriter(clientSocket.getOutputStream, true)
     val in: BufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream))
     while (true) {
