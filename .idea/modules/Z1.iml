@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="root [file:/C:/Users/wlade/Desktop/rozprochy/Z1/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
+<module external.linked.project.id="root [file:/home/wladek/IdeaProjects/SystemyRozproszone/Z1/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_19">
     <output url="file://$MODULE_DIR$/../../target/scala-3.1.0/classes" />
     <output-test url="file://$MODULE_DIR$/../../target/scala-3.1.0/test-classes" />
@@ -8,10 +8,11 @@
       <sourceFolder url="file://$MODULE_DIR$/../../src/main/scala" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/test/scala" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/../../target" />
-      <excludeFolder url="file://$MODULE_DIR$/../../project/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="scala-sdk-3.1.0" level="application" />
+    <orderEntry type="library" name="sbt: scala-sdk-3.1.0" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.6:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala3-library_3:3.1.0:jar" level="project" />
   </component>
 </module>
